@@ -1,0 +1,184 @@
+﻿//============================================================================
+// Name        : jogo_truco.cpp
+// Author      :
+// Version     :
+// Copyright   : Your copyright notice
+// Description : Hello World in C++, Ansi-style
+//============================================================================
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>    
+#include <array>        
+#include <random>       
+#include <chrono>
+
+using namespace std;
+
+//enum class Numeros{As,dois,tres,quatro,cinco,seis,sete,dez,J=8,Q=9,K=10};
+
+
+//enum class emblemas {heart=1,diamons=2,spade=3,clubs=4};
+//void Conversion(){
+
+//}
+//}
+
+//class Valor{
+//public:
+//    int valor;
+//    string val;
+//};
+//class Naipe{
+//public:
+//    int naipe;
+//    string naip;
+//};
+class Mesa{
+    
+    Gamer jogador;
+    Bot bot1;
+    Bot bot2;
+    Bot bot3;
+    
+    
+    void distribui_Cartas(){
+        
+    }
+};
+
+class Gamer{
+    Mao mao_jogador;//objeto
+public:
+    void recebe_cartas(){
+        
+    }
+    
+    
+};
+class Bot{
+    Mao mao_bot;//objeto 
+    
+};
+class Mao {
+    vector<Carta> mao;
+    
+};
+
+
+class Carta{ // criado a classe para gerar as cartas do jogo de truco
+
+public:
+    Carta(int naipe, int valor){
+        _naipe = naipe;
+        _valor = valor;
+    }
+
+    string getString(){
+        string value;
+
+        switch(_valor){
+        case 1:
+            value += "Ace";
+            break;
+        case 2:
+            value += "two";
+            break;
+        case 3:
+            value += "three";
+            break;
+        case 4:
+            value += "four";
+            break;
+        case 5:
+            value += "five";
+            break;
+        case 6:
+            value += "six";
+            break;
+        case 7:
+            value += "seven";
+            break;
+        case 10:
+            value += "ten";
+            break;
+        case 11:
+            value += "jack";
+            break;
+        case 12:
+            value += "queen";
+            break;
+        case 13:
+            value += "king";
+            break;
+
+
+
+        }
+
+        value += " of ";
+
+        switch(_naipe){
+        case 1:
+            value += "Hearts";
+            break;
+        case 2:
+            value += "Diamons";
+            break;
+        case 3:
+            value += "Spades";
+            break;
+        case 4:
+            value += "Clubs";
+            break;
+
+        }
+
+        return value;
+    }
+
+private:
+    int _valor;// valor das cartas {As,dois,tres,quatro,cinco,seis,sete,dez,J=8,Q=9,K=10};
+    int _naipe; //heart=1,diamons=2,spade=3,clubs=4;
+
+};
+
+
+class Deck{ //classe Deck que sera a junção dos naipes e dos valores das cartas
+
+public:
+
+    Deck(){
+        for (unsigned int k = 0; k < 4; k++) {
+            for (int j = 1; j <= 11; j++){
+                baralho.push_back(Carta(k,j));
+            }
+        }
+    }
+    void printDeck(){
+        for(auto carta: baralho){
+            cout << carta.getString() << endl;
+        }
+    }
+    void embaralhar(){
+        random_shuffle(baralho.begin(), baralho.end());
+    }
+
+private:
+    vector<Carta> baralho;
+    
+
+};
+
+
+int main() {
+
+    Deck deck; //
+    deck.printDeck();//mostrando na tela o valor da cartas com o seus naipes
+//    deck.embaralhar();
+//    deck.printDeck();
+
+//    cout<<<deck.baralho[28].val
+    return 0;
+}

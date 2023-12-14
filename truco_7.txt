@@ -1,0 +1,198 @@
+//============================================================================
+// Name        : jogo_truco.cpp
+// Author      :
+// Version     :
+// Copyright   : Your copyright notice
+// Description : Hello World in C++, Ansi-style
+//============================================================================
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <array>
+#include <random>
+#include <chrono>
+#include <QVector>
+
+using namespace std;
+
+
+
+
+
+
+
+
+class Carta{ // criado a classe para gerar as cartas do jogo de truco
+
+public:
+    Carta(int naipe, int valor){
+        _naipe = naipe;
+        _valor = valor;
+    }
+
+    string getString(){
+        string value;
+
+        switch(_valor){
+        case 1:
+            value += "Ace";
+            break;
+        case 2:
+            value += "two";
+            break;
+        case 3:
+            value += "three";
+            break;
+        case 4:
+            value += "four";
+            break;
+        case 5:
+            value += "five";
+            break;
+        case 6:
+            value += "six";
+            break;
+        case 7:
+            value += "seven";
+            break;
+        case 10:
+            value += "ten";
+            break;
+        case 11:
+            value += "jack";
+            break;
+        case 12:
+            value += "queen";
+            break;
+        case 13:
+            value += "king";
+            break;
+
+
+
+        }
+
+        value += " of ";
+
+        switch(_naipe){
+        case 1:
+            value += "Hearts";
+            break;
+        case 2:
+            value += "Diamons";
+            break;
+        case 3:
+            value += "Spades";
+            break;
+        case 4:
+            value += "Clubs";
+            break;
+
+        }
+
+        return value;
+    }
+
+public:
+    int _valor;// valor das cartas {As,dois,tres,quatro,cinco,seis,sete,dez,J=8,Q=9,K=10};
+    int _naipe; //heart=1,diamons=2,spade=3,clubs=4;
+
+};
+class Mao {
+    public:
+    QVector<Carta> mao;
+
+};
+
+
+
+class Deck{ //classe Deck que sera a junção dos naipes e dos valores das cartas
+
+public:
+
+    Deck(){
+        for (unsigned int k = 1; k <= 4; k++) {
+            for (int j = 1; j <= 13; j++){
+                if(!(j>7&&j<10)){
+                    baralho.push_back(Carta(k,j));
+                }
+            }
+        }
+    }
+    void printDeck(){
+        for(auto carta: baralho){
+            cout << carta.getString() << endl;
+        }
+    }
+
+    void embaralhar(){
+  unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+        shuffle(baralho.begin(), baralho.end(),std::default_random_engine(seed));
+    }
+    QVector<Carta> baralho;
+
+
+};
+
+class Bot{
+    public:
+    Mao mao;//objeto
+
+
+};
+
+class Gamer{
+    public:
+    Mao mao;//objeto
+
+public:
+        //    void recebe_cartas(){
+
+    //    }
+
+
+};
+class Mesa{
+
+    Gamer jogador;
+    Bot bot1;
+    Bot bot2;
+    Bot bot3;
+    Deck baralhos;
+
+public:
+    void distribui_Cartas(){
+        for(int i=0;i<3;i++){
+            bot1.mao.mao.push_back(baralhos.baralho.back());
+            baralhos.baralho.pop_back();
+            bot2.mao.mao.push_back(baralhos.baralho.back());
+            baralhos.baralho.pop_back();
+            bot3.mao.mao.push_back(baralhos.baralho.back());
+            baralhos.baralho.pop_back();
+            jogador.mao.mao.push_back(baralhos.baralho.back());
+            baralhos.baralho.pop_back();
+        }
+    }
+    void embaralhar(){
+        baralhos.embaralhar();
+    }
+    void printDeck(){
+        baralhos.printDeck();
+    }
+};
+
+
+int main() {
+
+    Mesa mesa;
+    mesa.printDeck();//mostrando na tela o valor da cartas com o seus naipes
+    mesa.embaralhar();
+    mesa.distribui_Cartas();
+    cout<<"\n";
+    mesa.printDeck();
+
+
+    return 0;
+}

@@ -1,0 +1,277 @@
+//============================================================================
+// Name        : jogo_truco.cpp
+// Author      :
+// Version     :
+// Copyright   : Your copyright notice
+// Description : Hello World in C++, Ansi-style
+//============================================================================
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <array>
+#include <random>
+#include <chrono>
+#include <QVector>
+
+using namespace std;
+
+
+
+
+
+
+
+
+class Carta{ // criado a classe para gerar as cartas do jogo de truco
+
+public:
+    Carta(int naipe, int valor){//todos dados sao privados
+        _naipe = naipe;
+        _valor = valor;
+    }
+
+    string getString(){
+        string value;
+
+        switch(_valor){
+        case 1:
+            value += "Ace";
+            break;
+        case 2:
+            value += "two";
+            break;
+        case 3:
+            value += "three";
+            break;
+        case 4:
+            value += "four";
+            break;
+        case 5:
+            value += "five";
+            break;
+        case 6:
+            value += "six";
+            break;
+        case 7:
+            value += "seven";
+            break;
+        case 10:
+            value += "ten";
+            break;
+        case 11:
+            value += "jack";
+            break;
+        case 12:
+            value += "queen";
+            break;
+        case 13:
+            value += "king";
+            break;
+        }
+
+        value += " of ";
+
+        switch(_naipe){
+        case 1:
+            value += "Hearts";
+            break;
+        case 2:
+            value += "Diamons";
+            break;
+        case 3:
+            value += "Spades";
+            break;
+        case 4:
+            value += "Clubs";
+            break;
+
+        }
+
+        return value;
+    }
+
+public:
+    int _valor;// valor das cartas {As,dois,tres,quatro,cinco,seis,sete,dez,J=8,Q=9,K=10};
+    int _naipe; //heart=1,diamons=2,spade=3,clubs=4;
+
+};
+class Mao {
+    public:
+    QVector<Carta> mao;
+    void printDeck(){
+        for(auto carta: mao){
+            cout <<carta.getString() << endl;
+        }
+    }
+    void printDeckp(){
+        int i=1;
+        for(auto carta: mao){
+            cout <<"carta "<<i<<" "<< carta.getString() << endl;
+            i++;
+        }
+    }
+};
+
+
+
+class Deck{ //classe Deck que sera a junção dos naipes e dos valores das cartas
+
+public:
+
+    QVector<Carta> baralho;//dado de entrada vetor de cartas
+
+    Deck(){
+        for (int k = 1; k <= 4; k++) {
+            for (int j = 1; j <= 13; j++){
+                if(!(j>7&&j<10)){
+                    baralho.push_back(Carta(k,j));
+                }
+            }
+        }
+    }
+    void printDeck(){
+        for(auto carta: baralho){
+            cout << carta.getString() << endl;
+        }
+    }
+
+    void embaralhar(){
+  unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+        shuffle(baralho.begin(), baralho.end(),std::default_random_engine(seed));
+    }
+
+
+
+};
+
+class Bot{
+    public:
+    Mao mao;//objeto
+    void printDeck(){
+        mao.printDeck();
+    }
+
+};
+
+class Gamer{
+    public:
+    Mao mao;//objeto
+
+public:
+    void printDeck(){
+        mao.printDeckp();
+    }
+};
+class Mesa{
+
+    Bot mesa;
+
+    Gamer jogador;
+    Bot bot1;
+    Bot bot2;
+    Bot bot3;
+    Deck baralhos;
+
+public:
+    Mesa(){
+        embaralhar();
+        distribui_Cartas();
+        carta_inicial();
+    }
+    void distribui_Cartas(){
+        for(int i=0;i<3;i++){
+            bot1.mao.mao.push_back(baralhos.baralho.back());
+            baralhos.baralho.pop_back();
+            bot2.mao.mao.push_back(baralhos.baralho.back());
+            baralhos.baralho.pop_back();
+            bot3.mao.mao.push_back(baralhos.baralho.back());
+            baralhos.baralho.pop_back();
+            jogador.mao.mao.push_back(baralhos.baralho.back());
+            baralhos.baralho.pop_back();
+        }
+    }
+    void carta_inicial(){
+       mesa.mao.mao.push_back(baralhos.baralho.back());
+       baralhos.baralho.pop_back();
+
+    }
+    void embaralhar(){
+        baralhos.embaralhar();
+    }
+    void printDeck(){
+        baralhos.printDeck();
+    }
+    void printAll(){
+        baralhos.printDeck();
+        cout<<"\n";
+        bot1.printDeck();
+        cout<<"\n";
+        bot2.printDeck();
+        cout<<"\n";
+        bot3.printDeck();
+        cout<<"\n";
+        jogador.printDeck();
+        cout<<"\n";
+        mesa.printDeck();
+        cout<<"\n";
+    }
+    void printStatus(){
+        cout<<"cartas do jogador:\n\n";
+        jogador.printDeck();
+        cout<<"\ncarta virada na mesa:\n\n";
+        mesa.printDeck();
+        cout<<"\n";
+        jogarCarta();
+    }
+//    void jogarCarta(){
+
+//        cout<<""<<;
+//    }
+    void jogarCarta(){
+        int r;
+        int x=1;
+
+        while(x){
+        cout<<"\ninsira o numero da carta correspondente\n\n";
+        cin>>r;
+        switch(r){
+        case 1:
+            mesa.mao.mao.push_back(jogador.mao.mao[0]);
+            cout<<"A carta "<<jogador.mao.mao[0].getString()<<" foi jogada \n";
+            jogador.mao.mao.erase(jogador.mao.mao.begin());
+            x=0;
+            break;
+        case 2:
+            mesa.mao.mao.push_back(jogador.mao.mao[1]);
+            cout<<"A carta "<<mesa.mao.mao[1].getString()<<" foi jogada \n";
+            jogador.mao.mao.erase(jogador.mao.mao.begin()+1);
+            x=0;
+            break;
+        case 3:
+            mesa.mao.mao.push_back(jogador.mao.mao[2]);
+            cout<<"A carta "<<jogador.mao.mao[2].getString()<<" foi jogada \n";
+            jogador.mao.mao.erase(jogador.mao.mao.begin()+2);
+            x=0;
+            break;
+         default:
+            cout<<"\nopção invalida \n";
+         }
+        }
+    }
+};
+
+
+int main() {
+
+    Mesa mesa;//uma istancia chamado mesa
+
+//    mesa.printDeck();//mostrando na tela o valor da cartas com o seus naipes
+//    mesa.embaralhar();
+//    mesa.distribui_Cartas();
+    mesa.printStatus();
+    cout<<"\n";
+    mesa.printAll();
+    return 0;
+}

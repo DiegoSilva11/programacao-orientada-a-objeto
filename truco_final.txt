@@ -1,0 +1,514 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <array>
+#include <random>
+#include <chrono>
+#include <QVector>
+
+using namespace std;
+
+class Carta{ // criado a classe para gerar as cartas do jogo de truco
+
+    int _valor;// valor das cartas {As,dois,tres,quatro,cinco,seis,sete,dez,J=8,Q=9,K=10};
+    int _naipe; //heart=1,diamons=2,spade=3,clubs=4;
+public:
+    Carta(int naipe, int valor){//todos dados sao privados
+        _naipe = naipe;
+        _valor = valor;
+    }
+
+    string getString(){
+        string value;
+
+        switch(_valor){
+        case 1:
+            value += "Ace";
+            break;
+        case 2:
+            value += "two";
+            break;
+        case 3:
+            value += "three";
+            break;
+        case 4:
+            value += "four";
+            break;
+        case 5:
+            value += "five";
+            break;
+        case 6:
+            value += "six";
+            break;
+        case 7:
+            value += "seven";
+            break;
+        case 8:
+            value += "eight";
+            break;
+        case 9:
+            value += "nine";
+            break;
+        case 10:
+            value += "ten";
+            break;
+        case 11:
+            value += "jack";
+            break;
+        case 12:
+            value += "queen";
+            break;
+        case 13:
+            value += "king";
+            break;
+        }
+
+        value += " of ";
+
+        switch(_naipe){
+        case 1:
+            value += "Hearts";
+            break;
+        case 2:
+            value += "Diamons";
+            break;
+        case 3:
+            value += "Spades";
+            break;
+        case 4:
+            value += "Clubs";
+            break;
+
+        }
+
+        return value;
+    }
+
+    int value(){
+        return _valor;
+    }
+    int naipe(){
+        return _naipe;
+    }
+
+
+};
+
+class Mao {
+
+    QVector<Carta> mao;// vetor de cartas da mao do jogador
+public:
+    void printDeck(){
+        for(auto carta: mao){
+            cout <<carta.getString() << endl;
+        }
+    }
+    void printDeckp(){ //só usado pelo jogador
+        int i=1;
+        for(auto carta: mao){
+            cout <<"carta "<<i<<" "<< carta.getString() << endl;
+            i++;
+        }
+    }
+    int quantidade(){
+        return mao.size();
+    }
+    void printUltima(){
+        cout <<mao[0].getString() << endl;
+    }
+    string getString(int i){
+        return mao[i].getString();
+    }
+    Carta getCarta(int i){
+        return mao[i];
+    }
+    void pushCarta(Carta nova){ //adiciona um Carta no final
+        mao.push_back(nova);
+    }
+    void popCarta(){ //tira um Carta do final
+        mao.pop_back();
+    }
+    void eraseCarta(int i){ //tira qualquer Carta
+        mao.erase(mao.begin()+(i));
+    }
+};
+
+
+
+class Deck{ //classe Deck é o baralho
+    QVector<Carta> baralho;//dado de entrada vetor de cartas
+public:
+    Deck(){
+        for (int k = 1; k <= 4; k++) { // gera 4 naipes
+            for (int j = 1; j <= 13; j++){
+                if(!(j>7&&j<11)){       //gera cartas de 1 a 7 e j,Q,K
+                    baralho.push_back(Carta(k,j));
+                }
+            }
+        }
+    }
+    void printDeck(){
+        for(auto carta: baralho){
+            cout << carta.getString() << endl;
+        }
+    }
+
+    void embaralhar(){ //enbaralhar as cartas com os seus naipes e valores
+        unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+        shuffle(baralho.begin(), baralho.end(),std::default_random_engine(seed));
+    }
+    int quantidade(){
+        return baralho.size();
+    }
+    void pushCarta(Carta nova){ //adiciona um Carta no final
+        baralho.push_back(nova);
+    }
+    void popCarta(){//tira um Carta do final
+        baralho.pop_back();
+    }
+    string getString(int i){
+        return baralho[i].getString();
+    }
+    Carta getCarta(int i){
+        return baralho[i];
+    }
+    Carta getUltima(){
+        return baralho[baralho.size()];
+    }
+
+
+};
+
+class Player{
+    //    public:
+    Mao mao;//objeto
+    int point=0;//variavel que contando os pontos do jogo
+    int pointRodada=0;//variavel que contando pontos da rodada
+
+public:
+    int quantidade(){
+        return mao.quantidade();
+    }
+    void printDeckp(){
+        mao.printDeckp();
+    }
+    void printDeck(){
+        mao.printDeck();
+    }
+    void printUltima(){
+        mao.printUltima();
+    }
+    string getString(int i){
+        return mao.getString(i);
+    }
+    Carta getCarta(int i){
+        return mao.getCarta(i);
+    }
+    void pushCarta(Carta nova){ //adiciona uma Carta no final
+        mao.pushCarta(nova);
+    }
+    void popCarta(){//tira a Carta do final
+        mao.popCarta();
+    }
+    void eraseCarta(int i){//tira qualquer Carta
+        if(i<quantidade())
+            mao.eraseCarta(i);
+    }
+    int getPoint(){
+        return point;
+    }
+    void setPoint(int ponto){
+        point=ponto;
+
+    }
+    void addPoint(int ponto){
+        point+=ponto;
+    }
+    int getPointRodada(){
+        return pointRodada;
+    }
+    void setPointRodada(int ponto){
+        pointRodada=ponto;
+    }
+};
+
+class Mesa{
+
+    Player mesa;//e o jogador da carta virada
+
+    Player jogador;//jogador que joga as cartas
+    Player bot1;//jogador que joga as cartas aleatoriamente
+    Player bot2;//jogador que joga as cartas aleatoriamente
+    Player bot3;//jogador que joga as cartas aleatoriamente
+    Deck baralho;// que distribui as cartas para o jogador e os BOTs
+    int truco=1; //multiplicador dos pontos,deve valer 1 ou 3;
+
+    void distribui_Cartas(){//distribui as 3 cartas para os jogadores
+        for(int i=0;i<3;i++){
+            jogador.pushCarta(baralho.getCarta(baralho.quantidade()-1));
+            baralho.popCarta();
+            bot1.pushCarta(baralho.getCarta(baralho.quantidade()-1));
+            baralho.popCarta();
+            bot2.pushCarta(baralho.getCarta(baralho.quantidade()-1));
+            baralho.popCarta();
+            bot3.pushCarta(baralho.getCarta(baralho.quantidade()-1));
+            baralho.popCarta();
+
+        }
+    }
+    void carta_inicial(){//funçao que tira a primeira carta, não foi usada
+        mesa.pushCarta(baralho.getCarta(baralho.quantidade()-1));
+        baralho.popCarta();
+
+    }
+    void embaralhar(){
+        baralho.embaralhar();
+    }
+
+public:
+    Mesa(){ //função principal que ira fazer o jogo aconteccer, tudo acontece aqui
+
+        bool r=true;
+        while(r){
+            cout<<"A "<<baralho.quantidade()<<" cartas no baralho\n";
+            r=false;
+            embaralhar();
+            distribui_Cartas();
+            carta_inicial();
+            cout<<"A "<<baralho.quantidade()<<" cartas no baralho\n";
+            for(int i=1;i<=3;i++){
+                printStatus();
+                Truco();
+                jogarCarta();
+                jogarBots();
+                MarcarPontos();
+            }
+            printPoints();
+            placar();
+            retornarCartas();
+            cout<<"A "<<baralho.quantidade()<<" cartas no baralho\n";
+            cout<<"\nJogo acabou\n";
+            cout<<"digite 's'  jogar novamente\n";
+            char t;
+            cin>>t;
+            if((t=='S')||(t=='s')){
+                r=true;
+                reniciar();
+            }
+        }
+        cout<<"\nFim do programa\n";
+    }
+
+    int valorCarta(Carta carta){//retorna o valor da carta com base no numero dela //decrecente a seguir 3,2,As,K,Q,J,7,6,5,4
+
+        int i=carta.value();
+        switch(i){
+        case 3:
+            return 10;
+        case 2:
+            return 9;
+        case 1:
+            return 8;
+        case 13:
+            return 7;
+        case 12:
+            return 6;
+        case 11:
+            return 5;
+        case 7:
+            return 4;
+        case 6:
+            return 3;
+        case 5:
+            return 2;
+        case 4:
+            return 1;
+        }
+        return 0;
+    }
+
+    void printDeck(){//imprime o baralho
+        baralho.printDeck();
+    }
+
+    void printAll(){ //imprime tudo
+        cout<<"\nbaralho:\n";
+        baralho.printDeck();
+        cout<<"\nBot 1 mao\n";
+        bot1.printDeck();
+        cout<<"\nBot 2 mao\n";
+        bot2.printDeck();
+        cout<<"\nBot 3 mao\n";
+        bot3.printDeck();
+        cout<<"\njogador mao\n";
+        jogador.printDeckp();
+        cout<<"\ncartas na mesa\n";
+        mesa.printDeck();
+        cout<<"\n";
+        printPoints();
+    }
+
+    void printPointsRodada(){ //imprime os pontos da rodada
+        cout<<"jogador "<<jogador.getPointRodada()<< " pontos\n";
+        cout<<"Bot 1 "<<bot1.getPointRodada()<< " pontos\n";
+        cout<<"Bot 2 "<<bot2.getPointRodada()<< " pontos\n";
+        cout<<"Bot 3 "<<bot3.getPointRodada()<< " pontos\n";
+    }
+
+    void printPoints(){ //imprime os pontos do jogo
+        cout<<"jogador ficou com "<<jogador.getPoint()<< " pontos\n";
+        cout<<"Bot 1 ficou com "<<bot1.getPoint()<< " pontos\n";
+        cout<<"Bot 2 ficou com "<<bot2.getPoint()<< " pontos\n";
+        cout<<"Bot 3 ficou com "<<bot3.getPoint()<< " pontos\n";
+
+    }
+
+    void printStatus(){ //imprime as cartas do jogador
+        cout<<"\ncartas do jogador:\n\n";
+        jogador.printDeckp();
+//        cout<<"\ncarta virada na mesa:\n\n"; //não esta sendo usado a carta da mesa
+//        mesa.printUltima();
+    }
+
+    void Truco(){ //pede truco
+        cout<<"\naperte 's' para trucar e a rodada valer tres pontos ou qualquer outra tecla para o jogo valer um ponto \n";
+        char t;
+
+        cin>>t;
+        fflush(stdin);
+        if((t=='S')||(t=='s')){
+            truco=3;
+            cout<<"A rodada vale 3 pontos \n\n";
+        }
+        else {
+            truco=1;
+            cout<<"A rodada vale 1 pontos \n\n";
+        }
+    }
+
+    void BotCartas(){ //não foi usado
+        for(int i=1;i<=3;i++){
+            if(i==1)
+                cout<<"Bot "<<i<<" possui "<<bot1.quantidade()<<", ";
+            else if(i==2)
+                cout<<"Bot "<<i<<" possui "<<bot2.quantidade()<<", ";
+            else
+                cout<<"Bot "<<i<<" possui "<<bot1.quantidade()<<", ";
+        }
+    }
+
+    void jogarCarta(){ //funçao que o jogador joga uma carta
+        int r=1; // tentei forçar o valor a ser 1 para poder testar, o jogador virou um bot
+        int x=1;
+        while(x){
+            fflush(stdin);
+            cout<<"insira o numero da carta correspondente\n\n";
+            cin>>r;
+            fflush(stdin);
+            if(r>0&&(r<=jogador.quantidade())){
+                mesa.pushCarta(jogador.getCarta(r-1));
+                cout<<"O Jogador jogou a carta "<<jogador.getString(r-1)<<"\n";
+                jogador.setPointRodada(valorCarta(jogador.getCarta(r-1)));
+//                cout<<"\nA carta vale \n"<<jogador.getPointRodada();
+                jogador.eraseCarta(r-1);
+                x=0;
+            }
+            else{
+                cout<<"\ncarta invalida, tente novamente\n";
+                fflush(stdin);
+            }
+        }
+    }
+
+    void jogarBots(){//funçao que os bots jogam uma carta
+        mesa.pushCarta(bot1.getCarta(bot1.quantidade()-1));
+        cout<<"O Bot 1 jogou a carta "<<bot1.getString(bot1.quantidade()-1)<<"\n";
+        bot1.setPointRodada(valorCarta(bot1.getCarta(0)));
+        bot1.popCarta();
+
+        mesa.pushCarta(bot2.getCarta(bot2.quantidade()-1));
+        cout<<"O Bot 2 jogou a carta "<<bot2.getString(bot2.quantidade()-1)<<"\n";
+        bot2.setPointRodada(valorCarta(bot2.getCarta(0)));
+        bot2.popCarta();
+
+        mesa.pushCarta(bot3.getCarta(bot3.quantidade()-1));
+        cout<<"O Bot 3 jogou a carta "<<bot3.getString(bot3.quantidade()-1)<<"\n";
+        bot3.setPointRodada(valorCarta(bot3.getCarta(0)));
+        bot3.popCarta();
+    }
+
+    void MarcarPontos(){ //determina o vencedordo da rodada
+        int a=jogador.getPointRodada();
+        int b=bot1.getPointRodada();
+        int c=bot2.getPointRodada();
+        int d=bot3.getPointRodada();
+        cout<<"\n";
+        if(a>b&&a>c&&a>d){
+            jogador.addPoint(1*truco);
+            cout<<"O Jogador venceu a Rodada e ganhou "<<1*truco<<" ponto\n";
+        }
+        else if(b>a&&b>c&&b>d){
+            bot1.addPoint(1*truco);
+            cout<<"O bot 1 venceu a Rodada e ganhou "<<1*truco<<" ponto\n";
+        }
+        else if(c>a&&c>b&&c>d){
+            bot2.addPoint(1*truco);
+            cout<<"O bot 2 venceu a Rodada e ganhou "<<1*truco<<" ponto\n";
+        }
+        else if(d>a&&d>b&&d>c){
+            bot3.addPoint(1*truco);
+            cout<<"O bot 3 venceu a Rodada e ganhou "<<1*truco<<" ponto\n";
+        }
+        else{
+            cout<<"Empate, ninguem ganhou nada\n";
+        }
+        cout<<"\n";
+    }
+
+    void placar(){ //determina o vencedordo jogo
+        int a=jogador.getPoint();
+        int b=bot1.getPoint();
+        int c=bot2.getPoint();
+        int d=bot3.getPoint();
+        cout<<"\n";
+        if(a>b&&a>c&&a>d){
+            cout<<"O Jogador venceu o jogo \n";
+        }
+        else if(b>a&&b>c&&b>d){
+            cout<<"O bot 1 venceu o jogo \n";
+        }
+        else if(c>a&&c>b&&c>d){
+            cout<<"O bot 2  venceu o jogo \n";
+        }
+        else if(d>a&&d>b&&d>c){
+            cout<<"O bot 3  venceu o jogo \n";
+        }
+        else{
+            cout<<"Empate\n";
+        }
+    }
+
+    void retornarCartas(){ //faz as cartas na mesa retornarem ao baralho
+        int m=mesa.quantidade();
+        for(int i=0;i<m;i++){
+            baralho.pushCarta(mesa.getCarta(mesa.quantidade()-1));
+            mesa.popCarta();
+        }
+    }
+    void reniciar(){ //limpa os pontos
+        for(int i=0;i<1;i++){
+            jogador.setPoint(0);
+            bot1.setPoint(0);
+            bot2.setPoint(0);
+            bot3.setPoint(0);
+        }
+    }
+};
+
+
+int main()
+{
+    Mesa mesa;//ao criar o objeto se inicia o jogo
+    return 0;
+}
